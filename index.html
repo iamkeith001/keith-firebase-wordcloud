@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>關鍵字收集</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 44px 40px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+    }
+    .emoji { font-size: 48px; text-align: center; display: block; margin-bottom: 12px; }
+    h1 {
+      font-size: 26px;
+      color: #222;
+      margin-bottom: 6px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .subtitle {
+      color: #888;
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid #e8e8e8;
+      border-radius: 14px;
+      font-size: 18px;
+      font-family: 'Noto Sans TC', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color: #333;
+    }
+    input[type="text"]:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    input[type="text"]::placeholder { color: #bbb; }
+    button#submitBtn {
+      padding: 14px 22px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button#submitBtn:hover { opacity: 0.88; }
+    button#submitBtn:active { transform: scale(0.96); }
+    button#submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .counter {
+      text-align: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .recent { border-top: 1px solid #f0f0f0; padding-top: 22px; }
+    .recent-label {
+      color: #aaa;
+      font-size: 12px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; min-height: 32px; }
+    .tag {
+      background: #f3f4f6;
+      color: #555;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      animation: popIn 0.25s ease;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .display-link {
+      text-align: center;
+      margin-top: 24px;
+    }
+    .display-link a {
+      display: inline-block;
+      color: #667eea;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 2px solid #667eea;
+      border-radius: 30px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .display-link a:hover {
+      background: #667eea;
+      color: white;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-size: 15px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+      font-family: 'Noto Sans TC', sans-serif;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="emoji">✏️</span>
+    <h1>關鍵字收集</h1>
+    <p class="subtitle">輸入你想到的關鍵字，按 Enter 或點送出</p>
+
+    <div class="input-group">
+      <input type="text" id="wordInput" placeholder="輸入關鍵字..." maxlength="20" autocomplete="off" />
+      <button id="submitBtn" onclick="submitWord()">送出</button>
+    </div>
+
+    <div class="counter" id="counter">共 0 個關鍵字</div>
+
+    <div class="recent">
+      <div class="recent-label">最新關鍵字</div>
+      <div class="tags" id="tagList"></div>
+    </div>
+
+    <div class="display-link">
+      <a href="display.html" target="_blank">☁️ 查看即時文字雲 →</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✅ 已送出！</div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import {
+      getFirestore, collection, addDoc, serverTimestamp,
+      onSnapshot, query, orderBy, limit
+    } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA3vAs6DAG8ff8zmA1tytvVa0_T1Xn3WBs",
+      authDomain: "keith-firebase.firebaseapp.com",
+      projectId: "keith-firebase",
+      storageBucket: "keith-firebase.firebasestorage.app",
+      messagingSenderId: "954257745716",
+      appId: "1:954257745716:web:d16da2701ae5da6ca2e761"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const wordsCol = collection(db, 'wordcloud_words');
+
+    // 即時監聽最新 50 筆
+    const q = query(wordsCol, orderBy('created_at', 'desc'), limit(50));
+    onSnapshot(q, (snapshot) => {
+      document.getElementById('counter').textContent = `共 ${snapshot.size} 個關鍵字`;
+      const tagList = document.getElementById('tagList');
+      tagList.innerHTML = '';
+      snapshot.docs.forEach(doc => {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = doc.data().word;
+        tagList.appendChild(tag);
+      });
+    });
+
+    window.submitWord = async function () {
+      const input = document.getElementById('wordInput');
+      const btn = document.getElementById('submitBtn');
+      const word = input.value.trim();
+      if (!word) return;
+
+      btn.disabled = true;
+      try {
+        await addDoc(wordsCol, { word, created_at: serverTimestamp() });
+        input.value = '';
+        showToast('✅ 已送出！');
+      } catch (e) {
+        showToast('❌ 送出失敗，請重試');
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    };
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    document.getElementById('wordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') window.submitWord();
+    });
+  </script>
+</body>
+</html>
