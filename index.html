@@ -26,24 +26,32 @@
       box-shadow: 0 24px 64px rgba(0,0,0,0.3);
     }
     .emoji { font-size: 48px; text-align: center; display: block; margin-bottom: 12px; }
-    h1 {
-      font-size: 26px;
-      color: #222;
-      margin-bottom: 6px;
-      text-align: center;
-      font-weight: 700;
-    }
-    .subtitle {
-      color: #888;
-      text-align: center;
-      margin-bottom: 32px;
-      font-size: 15px;
-    }
-    .input-group {
+    h1 { font-size: 26px; color: #222; margin-bottom: 6px; text-align: center; font-weight: 700; }
+    .session-badge {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
     }
+    .session-label { color: #999; font-size: 13px; }
+    .session-code {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .no-session {
+      text-align: center;
+      padding: 40px 0;
+      color: #888;
+    }
+    .no-session .icon { font-size: 56px; margin-bottom: 16px; }
+    .no-session p { font-size: 16px; line-height: 1.8; }
+    .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
     input[type="text"] {
       flex: 1;
       padding: 14px 18px;
@@ -55,10 +63,7 @@
       transition: border-color 0.2s, box-shadow 0.2s;
       color: #333;
     }
-    input[type="text"]:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
-    }
+    input[type="text"]:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.15); }
     input[type="text"]::placeholder { color: #bbb; }
     button#submitBtn {
       padding: 14px 22px;
@@ -87,14 +92,7 @@
       margin-bottom: 24px;
     }
     .recent { border-top: 1px solid #f0f0f0; padding-top: 22px; }
-    .recent-label {
-      color: #aaa;
-      font-size: 12px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 700;
-    }
+    .recent-label { color: #aaa; font-size: 12px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
     .tags { display: flex; flex-wrap: wrap; gap: 8px; min-height: 32px; }
     .tag {
       background: #f3f4f6;
@@ -104,29 +102,7 @@
       font-size: 14px;
       animation: popIn 0.25s ease;
     }
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.7); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-    .display-link {
-      text-align: center;
-      margin-top: 24px;
-    }
-    .display-link a {
-      display: inline-block;
-      color: #667eea;
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-      padding: 8px 16px;
-      border: 2px solid #667eea;
-      border-radius: 30px;
-      transition: background 0.2s, color 0.2s;
-    }
-    .display-link a:hover {
-      background: #667eea;
-      color: white;
-    }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
     .toast {
       position: fixed;
       bottom: 30px;
@@ -149,26 +125,34 @@
   <div class="card">
     <span class="emoji">✏️</span>
     <h1>關鍵字收集</h1>
-    <p class="subtitle">輸入你想到的關鍵字，按 Enter 或點送出</p>
 
-    <div class="input-group">
-      <input type="text" id="wordInput" placeholder="輸入關鍵字..." maxlength="20" autocomplete="off" />
-      <button id="submitBtn" onclick="submitWord()">送出</button>
+    <!-- 有場次：顯示表單 -->
+    <div id="mainContent" style="display:none">
+      <div class="session-badge">
+        <span class="session-label">場次</span>
+        <span class="session-code" id="sessionDisplay"></span>
+      </div>
+      <div class="input-group">
+        <input type="text" id="wordInput" placeholder="輸入關鍵字..." maxlength="20" autocomplete="off" />
+        <button id="submitBtn" onclick="submitWord()">送出</button>
+      </div>
+      <div class="counter" id="counter">共 0 個關鍵字</div>
+      <div class="recent">
+        <div class="recent-label">最新關鍵字</div>
+        <div class="tags" id="tagList"></div>
+      </div>
     </div>
 
-    <div class="counter" id="counter">共 0 個關鍵字</div>
-
-    <div class="recent">
-      <div class="recent-label">最新關鍵字</div>
-      <div class="tags" id="tagList"></div>
-    </div>
-
-    <div class="display-link">
-      <a href="display.html" target="_blank">☁️ 查看即時文字雲 →</a>
+    <!-- 無場次：提示掃碼 -->
+    <div id="noSession" style="display:none">
+      <div class="no-session">
+        <div class="icon">📵</div>
+        <p>請掃描老師提供的 QR Code<br>加入目前場次</p>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast">✅ 已送出！</div>
+  <div class="toast" id="toast"></div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
@@ -187,42 +171,56 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const wordsCol = collection(db, 'wordcloud_words');
+    const db  = getFirestore(app);
 
-    // 即時監聽最新 50 筆
-    const q = query(wordsCol, orderBy('created_at', 'desc'), limit(50));
-    onSnapshot(q, (snapshot) => {
-      document.getElementById('counter').textContent = `共 ${snapshot.size} 個關鍵字`;
-      const tagList = document.getElementById('tagList');
-      tagList.innerHTML = '';
-      snapshot.docs.forEach(doc => {
-        const tag = document.createElement('span');
-        tag.className = 'tag';
-        tag.textContent = doc.data().word;
-        tagList.appendChild(tag);
+    // 讀取場次碼
+    const params = new URLSearchParams(location.search);
+    const sessionId = params.get('s');
+
+    if (!sessionId) {
+      document.getElementById('noSession').style.display = 'block';
+    } else {
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('sessionDisplay').textContent = sessionId.toUpperCase();
+
+      const wordsCol = collection(db, 'sessions', sessionId, 'words');
+      const q = query(wordsCol, orderBy('created_at', 'desc'), limit(50));
+
+      onSnapshot(q, (snapshot) => {
+        document.getElementById('counter').textContent = `共 ${snapshot.size} 個關鍵字`;
+        const tagList = document.getElementById('tagList');
+        tagList.innerHTML = '';
+        snapshot.docs.forEach(doc => {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = doc.data().word;
+          tagList.appendChild(tag);
+        });
       });
-    });
 
-    window.submitWord = async function () {
-      const input = document.getElementById('wordInput');
-      const btn = document.getElementById('submitBtn');
-      const word = input.value.trim();
-      if (!word) return;
+      window.submitWord = async function () {
+        const input = document.getElementById('wordInput');
+        const btn   = document.getElementById('submitBtn');
+        const word  = input.value.trim();
+        if (!word) return;
+        btn.disabled = true;
+        try {
+          await addDoc(wordsCol, { word, created_at: serverTimestamp() });
+          input.value = '';
+          showToast('✅ 已送出！');
+        } catch (e) {
+          showToast('❌ 送出失敗，請重試');
+          console.error(e);
+        } finally {
+          btn.disabled = false;
+          input.focus();
+        }
+      };
 
-      btn.disabled = true;
-      try {
-        await addDoc(wordsCol, { word, created_at: serverTimestamp() });
-        input.value = '';
-        showToast('✅ 已送出！');
-      } catch (e) {
-        showToast('❌ 送出失敗，請重試');
-        console.error(e);
-      } finally {
-        btn.disabled = false;
-        input.focus();
-      }
-    };
+      document.getElementById('wordInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') window.submitWord();
+      });
+    }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -230,10 +228,6 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2200);
     }
-
-    document.getElementById('wordInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') window.submitWord();
-    });
   </script>
 </body>
 </html>

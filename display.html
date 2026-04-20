@@ -9,7 +9,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0f0c29;
       background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
       min-height: 100vh;
       font-family: 'Noto Sans TC', sans-serif;
@@ -18,34 +17,60 @@
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      padding: 14px 28px;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       background: rgba(0,0,0,0.35);
       backdrop-filter: blur(12px);
       z-index: 10;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    header h1 {
-      color: white;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
+    header h1 { color: white; font-size: 18px; font-weight: 700; flex: 1; }
     .badge {
       background: rgba(255,255,255,0.12);
       color: rgba(255,255,255,0.85);
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       border: 1px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
     }
-    #canvas-wrap {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+    .session-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(102,126,234,0.3);
+      border: 1px solid rgba(102,126,234,0.5);
+      color: white;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
     }
+    .session-badge .code { letter-spacing: 2px; font-size: 15px; }
+    .btn-header {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-header:hover { background: rgba(255,255,255,0.22); }
+    .btn-new {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.4);
+    }
+    .btn-new:hover { background: rgba(239,68,68,0.4); }
+    #canvas-wrap { position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
     canvas { display: block; }
     .empty-state {
       position: fixed;
@@ -56,61 +81,101 @@
       pointer-events: none;
     }
     .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
-    .empty-state p { font-size: 18px; }
-    .fab {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      padding: 12px 22px;
-      border-radius: 40px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      transition: background 0.2s;
-      z-index: 20;
-    }
-    .fab:hover { background: rgba(255,255,255,0.28); }
+    .empty-state p { font-size: 18px; line-height: 1.8; }
     .pulse-dot {
       display: inline-block;
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       background: #4ade80;
       border-radius: 50%;
-      margin-right: 8px;
       animation: pulse 2s infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.7); }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+    /* QR Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
     }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 24px;
+      padding: 36px 32px 28px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      position: relative;
+    }
+    .modal h2 { font-size: 20px; color: #222; margin-bottom: 6px; }
+    .modal .sub { color: #888; font-size: 13px; margin-bottom: 20px; }
+    .modal-code {
+      display: inline-block;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: white;
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+    }
+    #qr-modal-box { margin: 0 auto 16px; display: inline-block; }
+    .modal-url { font-size: 11px; color: #bbb; word-break: break-all; margin-bottom: 20px; }
+    .btn-close {
+      background: #f3f4f6;
+      color: #555;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn-close:hover { background: #e5e7eb; }
   </style>
 </head>
 <body>
   <header>
     <h1>☁️ 即時文字雲</h1>
-    <span class="badge"><span class="pulse-dot"></span><span id="count">載入中...</span></span>
+    <div class="session-badge">場次 <span class="code" id="sessionLabel">—</span></div>
+    <span class="badge"><span class="pulse-dot"></span>&nbsp;<span id="count">載入中</span></span>
+    <button class="btn-header" onclick="showQR()">📱 QR Code</button>
+    <button class="btn-header btn-new" onclick="newSession()">＋ 新的文字雲</button>
   </header>
 
   <div id="canvas-wrap">
     <canvas id="canvas"></canvas>
   </div>
 
-  <div class="empty-state" id="emptyState" style="display:none">
+  <div class="empty-state" id="emptyState">
     <div class="icon">✏️</div>
-    <p>還沒有關鍵字，快去提交吧！</p>
+    <p>還沒有關鍵字<br>請學生掃描 QR Code 送出</p>
   </div>
 
-  <a href="index.html" class="fab">✏️ 提交關鍵字</a>
+  <!-- QR Code Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeQR(event)">
+    <div class="modal">
+      <h2>📱 學生掃這裡</h2>
+      <p class="sub">請學生用手機掃描下方 QR Code</p>
+      <div class="modal-code" id="modalCode"></div>
+      <div id="qr-modal-box"></div>
+      <div class="modal-url" id="modalUrl"></div>
+      <button class="btn-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">關閉</button>
+    </div>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.2.2/wordcloud2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-    import {
-      getFirestore, collection, onSnapshot
-    } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+    import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyA3vAs6DAG8ff8zmA1tytvVa0_T1Xn3WBs",
@@ -122,8 +187,58 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db  = getFirestore(app);
 
+    // ── 場次碼 ──────────────────────────────
+    function genCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    const params = new URLSearchParams(location.search);
+    let sessionId = params.get('s');
+    if (!sessionId) {
+      sessionId = genCode();
+      history.replaceState(null, '', `?s=${sessionId}`);
+    }
+    document.getElementById('sessionLabel').textContent = sessionId.toUpperCase();
+
+    // ── 新的文字雲 ───────────────────────────
+    window.newSession = function () {
+      if (!confirm('確定要開新的文字雲嗎？\n（目前場次的資料還在，不會被刪除）')) return;
+      const newCode = genCode();
+      location.href = `display.html?s=${newCode}`;
+    };
+
+    // ── QR Code ──────────────────────────────
+    const BASE = 'https://iamkeith001.github.io/keith-firebase-wordcloud';
+    let qrGenerated = false;
+
+    window.showQR = function () {
+      const submitUrl = `${BASE}/index.html?s=${sessionId}`;
+      document.getElementById('modalCode').textContent = sessionId.toUpperCase();
+      document.getElementById('modalUrl').textContent = submitUrl;
+
+      if (!qrGenerated) {
+        new QRCode(document.getElementById('qr-modal-box'), {
+          text: submitUrl,
+          width: 200,
+          height: 200,
+          colorDark: '#5a4fcf',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        qrGenerated = true;
+      }
+      document.getElementById('modalOverlay').classList.add('open');
+    };
+
+    window.closeQR = function (e) {
+      if (e.target === document.getElementById('modalOverlay'))
+        document.getElementById('modalOverlay').classList.remove('open');
+    };
+
+    // ── Canvas ───────────────────────────────
     const canvas = document.getElementById('canvas');
     const emptyState = document.getElementById('emptyState');
 
@@ -134,31 +249,18 @@
     resizeCanvas();
     window.addEventListener('resize', () => { resizeCanvas(); renderCloud(); });
 
-    const COLORS = [
-      '#ff6b6b','#ffd93d','#6bcb77','#4d96ff',
-      '#c77dff','#ff9a3c','#00d2ff','#ff6eb4',
-      '#a8ff78','#f9ca24','#6ab04c','#e056fd'
-    ];
-
-    let wordData = [];
+    const COLORS = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9a3c','#00d2ff','#ff6eb4','#a8ff78','#f9ca24'];
+    let wordData  = [];
     let renderTimer = null;
 
     function renderCloud() {
-      if (wordData.length === 0) {
-        emptyState.style.display = 'block';
-        return;
-      }
+      if (wordData.length === 0) { emptyState.style.display = 'block'; return; }
       emptyState.style.display = 'none';
-
       const maxCount = wordData[0][1];
       WordCloud(canvas, {
         list: wordData,
         gridSize: Math.max(8, Math.round(14 * canvas.width / 1280)),
-        weightFactor: (n) => {
-          const ratio = n / maxCount;
-          const base  = canvas.width / 10;
-          return Math.max(18, Math.round(base * (0.3 + 0.7 * ratio)));
-        },
+        weightFactor: n => Math.max(18, Math.round(canvas.width / 10 * (0.3 + 0.7 * n / maxCount))),
         fontFamily: '"Noto Sans TC", "Microsoft JhengHei", sans-serif',
         color: () => COLORS[Math.floor(Math.random() * COLORS.length)],
         rotateRatio: 0.25,
@@ -170,18 +272,16 @@
       });
     }
 
-    onSnapshot(collection(db, 'wordcloud_words'), (snapshot) => {
+    // ── Firestore 即時監聽 ────────────────────
+    onSnapshot(collection(db, 'sessions', sessionId, 'words'), (snapshot) => {
       const freq = {};
       snapshot.forEach(doc => {
         const w = (doc.data().word || '').trim();
         if (w) freq[w] = (freq[w] || 0) + 1;
       });
-
       wordData = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-      const total = snapshot.size;
       document.getElementById('count').textContent =
-        total === 0 ? '尚無關鍵字' : `共 ${total} 個關鍵字`;
-
+        snapshot.size === 0 ? '尚無關鍵字' : `${snapshot.size} 個關鍵字`;
       clearTimeout(renderTimer);
       renderTimer = setTimeout(renderCloud, 400);
     });
