@@ -111,7 +111,7 @@
       <div class="card-title">學生提交頁</div>
       <span class="pill pill-submit">掃我來輸入關鍵字</span>
       <div class="qr-box">
-        <canvas id="qr-submit"></canvas>
+        <div id="qr-submit"></div>
       </div>
       <div class="card-desc">學生用手機掃描<br>輸入關鍵字送出</div>
       <div class="card-url" id="url-submit"></div>
@@ -123,7 +123,7 @@
       <div class="card-title">文字雲展示頁</div>
       <span class="pill pill-display">投影給全班看</span>
       <div class="qr-box">
-        <canvas id="qr-display"></canvas>
+        <div id="qr-display"></div>
       </div>
       <div class="card-desc">老師投影展示<br>關鍵字即時出現</div>
       <div class="card-url" id="url-display"></div>
@@ -139,13 +139,15 @@
     const SUBMIT_URL  = BASE + '/';
     const DISPLAY_URL = BASE + '/display.html';
 
-    function makeQR(canvasId, url, color) {
-      const canvas = document.getElementById(canvasId);
-      QRCode.toCanvas(canvas, url, {
+    function makeQR(divId, url, colorDark) {
+      new QRCode(document.getElementById(divId), {
+        text: url,
         width: 200,
-        margin: 1,
-        color: { dark: color, light: '#ffffff' }
-      }, err => { if (err) console.error(err); });
+        height: 200,
+        colorDark: colorDark,
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
     }
 
     makeQR('qr-submit',  SUBMIT_URL,  '#5a4fcf');
